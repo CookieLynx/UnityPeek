@@ -1,0 +1,51 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="UnityPeek.MainWindow"
+        Width="800" Height="600" Title="Avalonia UI Example">
+
+	<Grid>
+		<!-- Row definitions for header and content -->
+		<Grid.RowDefinitions>
+			<RowDefinition Height="40"/>
+			<!-- Header bar height -->
+			<RowDefinition Height="*"/>
+			<!-- Split screen content -->
+		</Grid.RowDefinitions>
+
+		<!-- Header Bar -->
+		<Border Grid.Row="0" Background="#333" Padding="5">
+			<DockPanel>
+				<!-- Magnifying Glass Button -->
+				<Button x:Name="AttachButton" Width="30" Height="30" Margin="0,0,5,0" Click="AttachButton_Click">>
+					<!-- Icon or content can go here -->
+				</Button>
+
+				<!-- Read-only TextBox -->
+				<TextBlock x:Name="ProcessText"
+					Text="Press the Magnifying Glass to Attach to Process"
+					Background="#444"
+					Foreground="White"
+					VerticalAlignment="Center"
+					HorizontalAlignment="Left"
+					Height="30"
+					Width="350"
+					Padding="5"
+					TextWrapping="Wrap" />
+			</DockPanel>
+		</Border>
+
+		<!-- Split Screen Content -->
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<!-- Left Side -->
+			<Border Background="#555" Grid.Column="0"/>
+
+			<!-- Right Side -->
+			<Border Background="#777" Grid.Column="1"/>
+		</Grid>
+	</Grid>
+</Window>
