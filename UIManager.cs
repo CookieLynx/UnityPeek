@@ -4,6 +4,9 @@ using Debug = System.Diagnostics.Debug;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 
 
 namespace UnityPeek
@@ -16,6 +19,8 @@ namespace UnityPeek
         {
             this.mainWindow = mainWindow;
             mainWindow.AttachButtonClicked += AttachButtonPressed;
+            mainWindow.ConnectButtonClicked += ConnectButtonPressed;
+            mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
             _statusTextBlock = mainWindow.ProcessTextBlock;
         }
 
@@ -53,6 +58,8 @@ namespace UnityPeek
                     if (AttachedProcess.IsAttached)
                     {
                         _statusTextBlock.Text = $"Attached to: {AttachedProcess.ProcessName}";
+
+                        //put the dll in the plugins folder
                     }
                     else
                     {
@@ -75,7 +82,7 @@ namespace UnityPeek
 
 
 
-        private async void ShowErrorPopup(string title, string message)
+        public static async void ShowErrorPopup(string title, string message)
         {
             var messageBox = MessageBoxManager
                 .GetMessageBoxStandard(title, message, ButtonEnum.Ok, Icon.Error);
@@ -105,16 +112,42 @@ namespace UnityPeek
             }
         }
 
-        
 
 
+        private void ConnectButtonPressed(object? sender, EventArgs e)
+        {
+            if(mainWindow.IpText.Text == null || mainWindow.PortText.Text == null)
+            {
+                return;
+            }
+            ConfigManager.SavePortIP(mainWindow.IpText.Text, mainWindow.PortText.Text);
+            Connection.AttemptConnection(mainWindow.IpText.Text, Int32.Parse(mainWindow.PortText.Text));
+        }
+
+
+        private void DisconnectButtonPressed(object? sender, EventArgs e)
+        {
+            Connection.Disconnect();
+        }
 
 
 
         public void Start()
         {
 
+
+            ConfigManager.LoadConfig();
             Debug.WriteLine("App has booted successfully!");
+
+
+            mainWindow.IpText.Text = ConfigManager.IP;
+            mainWindow.PortText.Text = ConfigManager.port;
+
+            
+
+
+
+
             /*
 
             _statusTextBlock.Text = "yoyoyo";
@@ -216,5 +249,7 @@ namespace UnityPeek
 
 
         }
+
+        
     }
 }

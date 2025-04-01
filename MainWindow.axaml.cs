@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 
 namespace UnityPeek;
 
@@ -12,15 +13,49 @@ public partial class MainWindow : Window
 
     public TextBlock ProcessTextBlock => this.FindControl<TextBlock>("ProcessText");
 
-    public event EventHandler? AttachButtonClicked;
+    public TextBox IpText => this.FindControl<TextBox>("IP");
+    public TextBox PortText => this.FindControl<TextBox>("Port");
+
+    public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked;
     public MainWindow()
     {
         InitializeComponent();
+
+        IpText.GotFocus += (sender, e) =>
+        {
+            IpText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+        };
+
+        IpText.LostFocus += (sender, e) =>
+        {
+            IpText.SetValue(TextBox.ForegroundProperty, Brushes.White);
+        };
+
+        PortText.GotFocus += (sender, e) =>
+        {
+            PortText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+        };
+
+        PortText.LostFocus += (sender, e) =>
+        {
+            PortText.SetValue(TextBox.ForegroundProperty, Brushes.White);
+        };
     }
 
     private void AttachButton_Click(object? sender, RoutedEventArgs e)
     {
         AttachButtonClicked?.Invoke(sender, e);
 
+    }
+
+
+    private void ConnectButton_Click(object? sender, RoutedEventArgs e)
+    {
+        ConnectButtonClicked?.Invoke(sender, e);
+    }
+
+    private void DisconnectButton_Click(object? sender, RoutedEventArgs e)
+    {
+        DisconnectButtonClicked?.Invoke(sender, e);
     }
 }
