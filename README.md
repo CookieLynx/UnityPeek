@@ -5,9 +5,6 @@
   <p align="center">
     An application to read Unity game data at runtime along with the <a href="https://github.com/CookieLynx/UnityPeekPlugin">UnityPeek BepInEx plugin!</a>
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
     <a href="https://github.com/CookieLynx/UnityPeek/releases">Releases</a>
     ·
     <a href="https://github.com/CookieLynx/UnityPeek/issues">Report Bug</a>
