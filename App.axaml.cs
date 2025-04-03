@@ -11,7 +11,7 @@ public partial class App : Application
     {
         AvaloniaXamlLoader.Load(this);
     }
-
+    UIManager reader;
     public override void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -20,9 +20,9 @@ public partial class App : Application
 
             if (desktop.MainWindow is MainWindow mainWindow)
             {
-                //var reader = new Reader(mainWindow.OutputDisplay, mainWindow.MethodsDisplay);
-                var reader = new UIManager(mainWindow);
-                reader.Start();
+                //Create the UIManager instance and start it
+                var uiManager = new UIManager(mainWindow);
+                uiManager.Start();
             }
         }
 

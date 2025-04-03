@@ -19,6 +19,9 @@ namespace UnityPeek
         public static bool HasBepInExInstalled { get; private set; } = false; 
 
         public static bool Error { get; private set; } = false;
+
+
+
         public static void AttachToProcess(string filePath)
         {
             //Reset the paths
@@ -33,18 +36,21 @@ namespace UnityPeek
 
             try
             {
+                //Check if the file exists
                 if (!System.IO.File.Exists(filePath))
                 {
                     Error = true;
                     return;
                 }
-                ProcessName = filePath.Substring(filePath.LastIndexOf("\\") + 1, filePath.Length - filePath.LastIndexOf("\\") - 5); //Get the name of the process without the .exe extension
+                //Get the name of the process without the .exe extension
+                ProcessName = filePath.Substring(filePath.LastIndexOf("\\") + 1, filePath.Length - filePath.LastIndexOf("\\") - 5); 
 
+                //Get the process root path
                 ProcessRootPath = System.IO.Directory.GetParent(filePath).ToString();
                 if (ProcessRootPath == null)
                 {
                     Error = true;
-                    return; //Error
+                    return; //Error somehow the directory does not exist
                 }
 
                 //Check if the process is a Unity game
@@ -53,7 +59,7 @@ namespace UnityPeek
                 {
                     Error = true;
                     Debug.WriteLine("Folder does not exist");
-                    return; //Not a unity game
+                    return; //Not a unity game since there is no Data folder
                 }
 
                 //Check if the process is using IL2CPP
@@ -64,8 +70,8 @@ namespace UnityPeek
                     return;
                 }
 
-
-                ProcessManagedPath = $@"{ProcessRootPath}\{ProcessName + "_Data"}\Managed\"; //The managed folder will not exist if the process is not a Unity game or is using IL2CPP
+                //The managed folder will not exist if the process is not a Unity game or is using IL2CPP
+                ProcessManagedPath = $@"{ProcessRootPath}\{ProcessName + "_Data"}\Managed\"; 
 
                 if (System.IO.Directory.Exists($@"{ProcessRootPath}\BepInEx"))
                 {

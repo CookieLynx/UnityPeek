@@ -14,18 +14,25 @@ namespace UnityPeek
         public static string IP = "192.168.1.1";
 
 
+        //Fetch the config directory which will be next to the dl
         public static string getConfigDir()
         {
             string dllPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            Debug.WriteLine(dllPath);   
-            string dllDirectory = System.IO.Path.GetDirectoryName(dllPath);
+            Debug.WriteLine(dllPath);  
+            //Chance of Dllpath not existing
+            string dllDirectory = System.IO.Path.GetDirectoryName(dllPath) ?? string.Empty;
             Debug.WriteLine(dllDirectory);
             string configPath = System.IO.Path.Combine(dllDirectory, "UnityPeekConfig.txt");
             Debug.WriteLine(configPath);
             return configPath;
         }
 
-        public static void SavePortIP(string newIp, string newPort)
+        /// <summary>
+        /// Save IP and Port to the config
+        /// </summary>
+        /// <param name="newIp">IP</param>
+        /// <param name="newPort">Port</param>
+        public static void SaveIPPort(string newIp, string newPort)
         {
             //Need a way better system for this
             if(newIp != null && newIp != "")
@@ -54,7 +61,7 @@ namespace UnityPeek
             string configPath = getConfigDir();
             if (System.IO.File.Exists(configPath))
             {
-                //Load the config
+                //Load the config by looping over all of the lines, ignoring ones with # and reading the key and value of the others
                 string[] lines = System.IO.File.ReadAllLines(configPath);
                 foreach (string line in lines)
                 {
@@ -99,6 +106,7 @@ namespace UnityPeek
 
         }
 
+        //Creates a new config with default values
         public static void CreateConfig()
         {
             string configFile = "" +

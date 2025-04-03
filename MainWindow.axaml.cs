@@ -16,11 +16,14 @@ public partial class MainWindow : Window
     public TextBox IpText => this.FindControl<TextBox>("IP");
     public TextBox PortText => this.FindControl<TextBox>("Port");
 
-    public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked;
+    public TextBlock connectedText => this.FindControl<TextBlock>("ConnectionStatus");
+
+    public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked, FetchHirarchyClicked;
     public MainWindow()
     {
         InitializeComponent();
 
+        //Change of text color when box is selected
         IpText.GotFocus += (sender, e) =>
         {
             IpText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
@@ -42,6 +45,8 @@ public partial class MainWindow : Window
         };
     }
 
+    //All the button events
+
     private void AttachButton_Click(object? sender, RoutedEventArgs e)
     {
         AttachButtonClicked?.Invoke(sender, e);
@@ -57,5 +62,10 @@ public partial class MainWindow : Window
     private void DisconnectButton_Click(object? sender, RoutedEventArgs e)
     {
         DisconnectButtonClicked?.Invoke(sender, e);
+    }
+
+    private void FetchHirarchy_Click(object? sender, RoutedEventArgs e)
+    {
+        FetchHirarchyClicked?.Invoke(sender, e);
     }
 }

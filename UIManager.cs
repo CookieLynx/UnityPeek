@@ -13,15 +13,19 @@ namespace UnityPeek
 {
     class UIManager
     {
-        private TextBlock _statusTextBlock;
+        public static UIManager uiManager;
+
         private MainWindow mainWindow;
+
+        //Constructor to get all of the button methods and the mainWindow itself
         public UIManager(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
             mainWindow.AttachButtonClicked += AttachButtonPressed;
             mainWindow.ConnectButtonClicked += ConnectButtonPressed;
             mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
-            _statusTextBlock = mainWindow.ProcessTextBlock;
+            mainWindow.FetchHirarchyClicked += FetchHirarchyPressed;
+            uiManager = this;
         }
 
 
@@ -32,6 +36,7 @@ namespace UnityPeek
             Debug.WriteLine("Attach Button clicked!");
             if (mainWindow.StorageProvider != null) // Ensure StorageProvider is available
             {
+                //Not sure if this will work on Linux or MacOS
                 var files = await mainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
                 {
                     Title = "Select a Unity Game .EXE",
@@ -49,22 +54,27 @@ namespace UnityPeek
                 }
                 });
 
+                //User selected a file
                 if (files != null && files.Count > 0)
                 {
                     var selectedFile = files[0].Path.LocalPath;
+
+
                     AttachedProcess.AttachToProcess(selectedFile);
+
+
                     HandAttachErrors();
 
                     if (AttachedProcess.IsAttached)
                     {
-                        _statusTextBlock.Text = $"Attached to: {AttachedProcess.ProcessName}";
+                        mainWindow.ProcessTextBlock.Text = $"Attached to: {AttachedProcess.ProcessName}";
 
                         //put the dll in the plugins folder
                     }
                     else
                     {
 
-                        _statusTextBlock.Text = "Failed to attach";
+                        mainWindow.ProcessTextBlock.Text = "Failed to attach";
 
                     }
 
@@ -74,27 +84,33 @@ namespace UnityPeek
             else
             {
                 Debug.WriteLine("StorageProvider is not available.");
-                ShowErrorPopup("Error", "Could not start the file browser.");
+                ShowPopup("Error", "Could not start the file browser.", Icon.Error);
             }
         }
 
 
 
 
-
-        public static async void ShowErrorPopup(string title, string message)
+        /// <summary>
+        /// Show a popup error message
+        /// </summary>
+        /// <param name="title">Error box tittle</param>
+        /// <param name="message">Error box message</param>
+        public static async void ShowPopup(string title, string message, Icon icon)
         {
             var messageBox = MessageBoxManager
-                .GetMessageBoxStandard(title, message, ButtonEnum.Ok, Icon.Error);
+                .GetMessageBoxStandard(title, message, ButtonEnum.Ok, icon);
 
             await messageBox.ShowAsync();
         }
+
+
 
         private void HandAttachErrors()
         {
             if (AttachedProcess.Error)
             {
-                ShowErrorPopup("Error", "An error occured while trying to attach to the process.");
+                ShowPopup("Error", "An error occured while trying to attach to the process.", Icon.Error);
             }
             else
             {
@@ -103,43 +119,59 @@ namespace UnityPeek
                 //Different popups for different errors
                 if (AttachedProcess.IsIL2CPP)
                 {
-                    ShowErrorPopup("Error", "IL2CPP is not currently supported, please select a non IL2CPP Unity Game.");
+                    ShowPopup("Error", "IL2CPP is not currently supported, please select a non IL2CPP Unity Game.", Icon.Error);
                 }
                 else if (!AttachedProcess.HasBepInExInstalled)
                 {
-                    ShowErrorPopup("Error", "You should install BepInEx v6.0.0 before running this tool.");
+                    ShowPopup("Error", "You should install BepInEx v6.0.0 before running this tool.", Icon.Error);
                 }
             }
         }
 
 
+        //Update the connection text
+        public static void ChangeConnectedText(bool connected)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                uiManager.mainWindow.connectedText.Text = connected ? "Connected" : "Disconnected";
+            });
+        }
 
+
+
+        //Connect button event
         private void ConnectButtonPressed(object? sender, EventArgs e)
         {
             if(mainWindow.IpText.Text == null || mainWindow.PortText.Text == null)
             {
                 return;
             }
-            ConfigManager.SavePortIP(mainWindow.IpText.Text, mainWindow.PortText.Text);
+            ConfigManager.SaveIPPort(mainWindow.IpText.Text, mainWindow.PortText.Text);
             Connection.AttemptConnection(mainWindow.IpText.Text, Int32.Parse(mainWindow.PortText.Text));
         }
 
-
+        //Disconnect button event
         private void DisconnectButtonPressed(object? sender, EventArgs e)
         {
             Connection.Disconnect();
+        }
+
+        //Fetch hierarchy button event
+        private void FetchHirarchyPressed(object? sender, EventArgs e)
+        {
+            Connection.FetchHierarchy();
         }
 
 
 
         public void Start()
         {
-
-
+            //Load or create config
             ConfigManager.LoadConfig();
             Debug.WriteLine("App has booted successfully!");
 
-
+            //Set the values inside the window
             mainWindow.IpText.Text = ConfigManager.IP;
             mainWindow.PortText.Text = ConfigManager.port;
 
