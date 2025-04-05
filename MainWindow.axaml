@@ -1,5 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:UnityPeek"
+		xmlns:avt="clr-namespace:Avalonia.Controls.Templates;assembly=Avalonia.Controls"
         x:Class="UnityPeek.MainWindow"
         Width="800" Height="600" Title="UnityPeek">
 
@@ -125,7 +127,23 @@
 			</Grid.ColumnDefinitions>
 
 			<!-- Left Side -->
-			<Border Background="#555" Grid.Column="0"/>
+
+			<Border Background="#555" Grid.Column="0" Padding="5">
+				<TreeView x:Name="HierarchyTreeView"
+					Background="#444"
+					BorderThickness="0"
+					Foreground="White">
+
+					<TreeView.DataTemplates>
+						<TreeDataTemplate DataType="local:HierarchyNode"
+										  x:DataType="local:HierarchyNode"
+										  ItemsSource="{Binding Children}">
+							<TextBlock Text="{Binding Name}" Padding="2"/>
+						</TreeDataTemplate>
+					</TreeView.DataTemplates>
+				</TreeView>
+			</Border>
+			
 
 			<!-- Right Side -->
 			<Border Background="#777" Grid.Column="1"/>

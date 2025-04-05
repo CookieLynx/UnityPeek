@@ -173,6 +173,7 @@ namespace UnityPeek
                     //Debug.WriteLine("Inside while loop " + tempCounter++);
                 }
                 Helpers.HierachyStructure root = DecodeRecivedHierarchyData(ms.ToArray());
+                UIManager.UpdateHierarchy(root);
                 Debug.WriteLine("Received: " + root.name + " With " + root.children.Count + " children");
             }
         }

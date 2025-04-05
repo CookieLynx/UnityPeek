@@ -7,6 +7,9 @@ using MsBox.Avalonia;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 
 
 namespace UnityPeek
@@ -164,6 +167,64 @@ namespace UnityPeek
         }
 
 
+        private static List<int> idList = new List<int>();
+
+
+
+        private static void AddChildrenToHierachyNode(Helpers.HierachyStructure child, HierarchyNode parentNode)
+        {
+
+            var childNode = new HierarchyNode { Name = child.name };
+            idList.Add(Int32.Parse(child.id));
+            parentNode.Children.Add(childNode);
+            
+            // Sort children by siblingIndex (lower siblingIndex comes first)
+            var sortedChildren = child.children.OrderBy(c => c.siblingIndex).ToList();
+            
+            foreach (var grandChild in sortedChildren)
+            {
+                AddChildrenToHierachyNode(grandChild, childNode);
+            }
+        }
+
+
+        public static void UpdateHierarchy(Helpers.HierachyStructure root)
+        {
+            int index = root.siblingIndex;
+
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                var rootNode = new HierarchyNode { Name = root.name };
+
+                var sortedChildren = root.children.OrderBy(c => c.siblingIndex).ToList();
+
+                // Add sorted children to the root node
+                foreach (var child in sortedChildren)
+                {
+                    AddChildrenToHierachyNode(child, rootNode);
+                }
+
+                // Set the items source for the tree view
+                uiManager.mainWindow.HierarchyTreeView.ItemsSource = new List<HierarchyNode> { rootNode };
+            });
+
+
+            //check if ids are unique
+            var duplicates = idList.GroupBy(x => x)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+            if (duplicates.Count > 0)
+            {
+                Debug.WriteLine("Duplicate IDs found: " + string.Join(", ", duplicates));
+            }
+            else
+            {
+                Debug.WriteLine("No duplicate IDs found.");
+            }
+        }
+
+
 
         public void Start()
         {
@@ -175,9 +236,9 @@ namespace UnityPeek
             mainWindow.IpText.Text = ConfigManager.IP;
             mainWindow.PortText.Text = ConfigManager.port;
 
+
+
             
-
-
 
 
             /*
