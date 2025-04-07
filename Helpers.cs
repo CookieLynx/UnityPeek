@@ -21,6 +21,54 @@ namespace UnityPeek
             public List<HierachyStructure> children = new List<HierachyStructure>();
         }
 
+        /// <summary>
+        /// Recursively remove a node from the hierarchy by its ID.
+        /// </summary>
+        /// <param name="id">The ID to remove</param>
+        /// <param name="rootNode">The root node to loop through</param>
+        /// <returns></returns>
+        public static bool RemoveNode(string id, HierachyStructure rootNode)
+        {
+            if (rootNode == null)
+                return false;
+
+            // Convert id to string for comparison
+            string idStr = id;
+
+            // Check if the root node is the one to be removed
+            if (rootNode.id == idStr)
+            {
+                if (rootNode.parent != null)
+                {
+                    rootNode.parent.children.Remove(rootNode);
+                    return true;
+                }
+                return false; // Cannot remove root node if it has no parent
+            }
+
+            // Use a queue for breadth-first search
+            Queue<HierachyStructure> queue = new Queue<HierachyStructure>();
+            queue.Enqueue(rootNode);
+
+            while (queue.Count > 0)
+            {
+                var currentNode = queue.Dequeue();
+
+                // Check all children of the current node
+                foreach (var child in currentNode.children)
+                {
+                    if (child.id == idStr)
+                    {
+                        currentNode.children.Remove(child);
+                        return true;
+                    }
+                    queue.Enqueue(child);
+                }
+            }
+
+            return false; // Node with the given id was not found
+        }
+
 
         public static HierachyStructure DeserializeHierarchy(byte[] data)
         {

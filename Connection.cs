@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Metsys.Bson;
 using MsBox.Avalonia.Enums;
 using Tmds.DBus.Protocol;
+using UnityPeek.UI;
 
 namespace UnityPeek
 {
@@ -114,7 +115,7 @@ namespace UnityPeek
                             if (typeId == 1)
                             {
                                 Debug.WriteLine("Fetch Hierarchy Data");
-                                GatherHierarchyChunkData(stream);
+                                HierachyHandler.GatherHierarchyChunkData(stream);
                             }
                             else
                             {
@@ -157,26 +158,7 @@ namespace UnityPeek
         }
 
         
-        private static void GatherHierarchyChunkData(NetworkStream stream)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                Debug.WriteLine("Reading Chunk");
-                byte[] buffer2 = new byte[1024];
-                int bytesRead2;
-                //int tempCounter = 0;
-
-                //Loop over each chunk in the stream and write to a memory stream
-                while (stream.DataAvailable && (bytesRead2 = stream.Read(buffer2, 0, buffer2.Length)) > 0)
-                {
-                    ms.Write(buffer2, 0, bytesRead2);
-                    //Debug.WriteLine("Inside while loop " + tempCounter++);
-                }
-                Helpers.HierachyStructure root = DecodeRecivedHierarchyData(ms.ToArray());
-                UIManager.UpdateHierarchy(root);
-                Debug.WriteLine("Received: " + root.name + " With " + root.children.Count + " children");
-            }
-        }
+        
 
         /// <summary>
         /// Reads the first 4 bytes of a message to get type ID (0 for string, 1 for Hierarchy data)
@@ -222,16 +204,6 @@ namespace UnityPeek
             return Encoding.ASCII.GetString(buffer, 0, bytesRead);
         }
 
-        /// <summary>
-        /// Decodes array into HierachyStructure
-        /// </summary>
-        /// <param name="array">Hierarchy data array</param>
-        /// <returns></returns>
-        private static Helpers.HierachyStructure DecodeRecivedHierarchyData(byte[] array)
-        {
-            Debug.WriteLine("Decoding");
-            Helpers.HierachyStructure root = Helpers.DeserializeHierarchy(array);
-            return root;
-        }
+        
     }
 }

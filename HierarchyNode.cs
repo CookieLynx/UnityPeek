@@ -6,5 +6,7 @@ namespace UnityPeek
     {
         public string Name { get; set; }
         public List<HierarchyNode> Children { get; set; } = new();
+
+        public int Id { get; set; }
     }
 }
