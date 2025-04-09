@@ -53,13 +53,14 @@ namespace UnityPeek
             if(clientThread != null)
             {
                 isServerRunning = false;
+                Disconnect();
             }
 
 
             //Start the server thread
 
             Thread newClientThread = new Thread(StartClient);
-
+            
             clientThread = newClientThread;
             clientThread.IsBackground = true;
             isServerRunning = true;
@@ -101,6 +102,7 @@ namespace UnityPeek
                     //Check if the server is running, if not the thread will die
                     while (isServerRunning)
                     {
+                        isConnected = true;
                         SendData(stream, messageToSend);
 
                         if (stream.DataAvailable)
@@ -116,6 +118,9 @@ namespace UnityPeek
                             {
                                 Debug.WriteLine("Fetch Hierarchy Data");
                                 HierachyHandler.GatherHierarchyChunkData(stream);
+                            }else if (typeId == 3)
+                            {
+                                ReadTransformData(stream);
                             }
                             else
                             {
@@ -125,6 +130,11 @@ namespace UnityPeek
 
                         Thread.Sleep(10); // Prevent high CPU usage
                     }
+
+                    //Connection has dropped
+                    Disconnect();
+                    UIManager.ChangeConnectedText(false);
+                    isConnected = false;
                 }
             }
             catch (Exception ex)
@@ -133,7 +143,51 @@ namespace UnityPeek
                 {
                     UIManager.ShowPopup("Error Connecting", ex.Message, Icon.Error);
                 });
+                isConnected = false;
+                Disconnect();
                 Debug.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+        private static void ReadTransformData(NetworkStream stream)
+        {
+            // Buffer to hold the incoming data
+            byte[] buffer = new byte[40]; // 40 bytes: 3 floats for position, 4 floats for rotation, 3 floats for scale (4 bytes each)
+
+            // Read the data from the stream
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            if (bytesRead == buffer.Length)
+            {
+                using (MemoryStream memoryStream = new MemoryStream(buffer))
+                {
+                    using (BinaryReader reader = new BinaryReader(memoryStream))
+                    {
+                        // Read position
+                        float posX = reader.ReadSingle();
+                        float posY = reader.ReadSingle();
+                        float posZ = reader.ReadSingle();
+
+                        // Read rotation
+                        float rotX = reader.ReadSingle();
+                        float rotY = reader.ReadSingle();
+                        float rotZ = reader.ReadSingle();
+                        float rotW = reader.ReadSingle();
+
+                        // Read scale
+                        float scaleX = reader.ReadSingle();
+                        float scaleY = reader.ReadSingle();
+                        float scaleZ = reader.ReadSingle();
+
+                        // Log the decoded values for debugging
+                        Debug.WriteLine($"Position: ({posX}, {posY}, {posZ})");
+                        Debug.WriteLine($"Rotation: ({rotX}, {rotY}, {rotZ}, {rotW})");
+                        Debug.WriteLine($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
+                    }
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Error: Incomplete transform data received.");
             }
         }
 
@@ -191,7 +245,27 @@ namespace UnityPeek
 
         public static void FetchHierarchy()
         {
-            messageToSend = "FetchHierarchy";
+
+            if (isConnected)
+            {
+                messageToSend = "FetchHierarchy";
+            }else
+            {
+                UIManager.ShowPopup("Error", "You are not connected to a game", Icon.Error);
+            }
+        }
+
+        public static void SendSelectedNode(int id)
+        {
+            if (isConnected)
+            {
+                messageToSend = "SelectedNode:" + id;
+            }
+            else
+            {
+                //I dont think this can trigger but just in case
+                UIManager.ShowPopup("Error", "You are not connected to a game", Icon.Error);
+            }
         }
 
         /// <summary>

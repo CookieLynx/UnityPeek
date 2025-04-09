@@ -28,6 +28,7 @@ namespace UnityPeek.UI
             mainWindow.ConnectButtonClicked += ConnectButtonPressed;
             mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
             mainWindow.FetchHirarchyClicked += FetchHirarchyPressed;
+            mainWindow.SelectedHierachyNode += SelectedHierachyNode;
             uiManager = this;
         }
 
@@ -138,6 +139,8 @@ namespace UnityPeek.UI
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
             {
                 uiManager.mainWindow.connectedText.Text = connected ? "Connected" : "Disconnected";
+                //we also clear the hierarchy view
+                uiManager.mainWindow.HierarchyTreeView.ItemsSource = null;
             });
         }
 
@@ -174,10 +177,20 @@ namespace UnityPeek.UI
         }
 
 
-        
+
+        private void SelectedHierachyNode(object? sender, EventArgs e)
+        {
+            if (mainWindow.HierarchyTreeView.SelectedItem is HierarchyNode selectedNode)
+            {
+                HierachyHandler.SelectedNode(selectedNode);
+            }
+        }
 
 
-        
+
+
+
+
 
 
 

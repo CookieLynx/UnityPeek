@@ -13,7 +13,7 @@ namespace UnityPeek
 {
     class HierachyHandler
     {
-        private int selectedID = -1;
+        private static int selectedID = -1;
 
 
 
@@ -134,6 +134,14 @@ namespace UnityPeek
             {
                 UIManager.UpdateHierarchyView(rootNode);
             });
+        }
+
+
+        public static void SelectedNode(HierarchyNode selectedNode)
+        {
+            selectedID = selectedNode.Id;
+            Connection.SendSelectedNode(selectedID);
+            Debug.WriteLine($"Selected node: {selectedNode.Name}");
         }
     }
 }

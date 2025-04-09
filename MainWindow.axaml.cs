@@ -18,10 +18,12 @@ public partial class MainWindow : Window
 
     public TextBlock connectedText => this.FindControl<TextBlock>("ConnectionStatus");
 
-    public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked, FetchHirarchyClicked;
+    public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked, FetchHirarchyClicked, SelectedHierachyNode;
     public MainWindow()
     {
         InitializeComponent();
+
+        HierarchyTreeView.SelectionChanged += HierarchyTreeView_SelectionChanged;
 
         //Change of text color when box is selected
         IpText.GotFocus += (sender, e) =>
@@ -67,5 +69,11 @@ public partial class MainWindow : Window
     private void FetchHirarchy_Click(object? sender, RoutedEventArgs e)
     {
         FetchHirarchyClicked?.Invoke(sender, e);
+    }
+
+
+    private void HierarchyTreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        SelectedHierachyNode.Invoke(sender, e);
     }
 }
