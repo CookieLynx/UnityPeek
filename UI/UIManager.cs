@@ -1,192 +1,184 @@
 ﻿using System;
-using Avalonia.Controls;
-using Debug = System.Diagnostics.Debug;
-using Avalonia.Platform.Storage;
-using MsBox.Avalonia.Enums;
-using MsBox.Avalonia;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
+using Avalonia.Platform.Storage;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
+using Debug = System.Diagnostics.Debug;
 
 
 namespace UnityPeek.UI
 {
-    class UIManager
-    {
-        public static UIManager uiManager;
+	class UIManager
+	{
+		public static UIManager uiManager;
 
-        private MainWindow mainWindow;
+		private MainWindow mainWindow;
 
-        //Constructor to get all of the button methods and the mainWindow itself
-        public UIManager(MainWindow mainWindow)
-        {
-            this.mainWindow = mainWindow;
-            mainWindow.AttachButtonClicked += AttachButtonPressed;
-            mainWindow.ConnectButtonClicked += ConnectButtonPressed;
-            mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
-            mainWindow.FetchHirarchyClicked += FetchHirarchyPressed;
-            mainWindow.SelectedHierachyNode += SelectedHierachyNode;
-            uiManager = this;
-        }
-
-
-
-
-        private async void AttachButtonPressed(object? sender, EventArgs e)
-        {
-            Debug.WriteLine("Attach Button clicked!");
-            if (mainWindow.StorageProvider != null) // Ensure StorageProvider is available
-            {
-                //Not sure if this will work on Linux or MacOS
-                var files = await mainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
-                {
-                    Title = "Select a Unity Game .EXE",
-                    AllowMultiple = false,
-                    FileTypeFilter = new[]
-                    {
-                    new FilePickerFileType("Executable Files")
-                    {
-                        Patterns = new[] { "*.exe" }
-                    },
-                    new FilePickerFileType("All Files")
-                    {
-                        Patterns = new[] { "*" }
-                    }
-                }
-                });
-
-                //User selected a file
-                if (files != null && files.Count > 0)
-                {
-                    var selectedFile = files[0].Path.LocalPath;
-
-
-                    AttachedProcess.AttachToProcess(selectedFile);
-
-
-                    HandAttachErrors();
-
-                    if (AttachedProcess.IsAttached)
-                    {
-                        mainWindow.ProcessTextBlock.Text = $"Attached to: {AttachedProcess.ProcessName}";
-
-                        //put the dll in the plugins folder
-                    }
-                    else
-                    {
-
-                        mainWindow.ProcessTextBlock.Text = "Failed to attach";
-
-                    }
-
-                    //Console.WriteLine($"Selected file: {selectedFile}");
-                }
-            }
-            else
-            {
-                Debug.WriteLine("StorageProvider is not available.");
-                ShowPopup("Error", "Could not start the file browser.", Icon.Error);
-            }
-        }
+		//Constructor to get all of the button methods and the mainWindow itself
+		public UIManager(MainWindow mainWindow)
+		{
+			this.mainWindow = mainWindow;
+			mainWindow.AttachButtonClicked += AttachButtonPressed;
+			mainWindow.ConnectButtonClicked += ConnectButtonPressed;
+			mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
+			mainWindow.FetchHirarchyClicked += FetchHirarchyPressed;
+			mainWindow.SelectedHierachyNode += SelectedHierachyNode;
+			uiManager = this;
+		}
 
 
 
 
-        /// <summary>
-        /// Show a popup error message
-        /// </summary>
-        /// <param name="title">Error box tittle</param>
-        /// <param name="message">Error box message</param>
-        public static async void ShowPopup(string title, string message, Icon icon)
-        {
-            var messageBox = MessageBoxManager
-                .GetMessageBoxStandard(title, message, ButtonEnum.Ok, icon);
+		private async void AttachButtonPressed(object? sender, EventArgs e)
+		{
+			Debug.WriteLine("Attach Button clicked!");
+			if (mainWindow.StorageProvider != null) // Ensure StorageProvider is available
+			{
+				//Not sure if this will work on Linux or MacOS
+				var files = await mainWindow.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+				{
+					Title = "Select a Unity Game .EXE",
+					AllowMultiple = false,
+					FileTypeFilter = new[]
+					{
+					new FilePickerFileType("Executable Files")
+					{
+						Patterns = new[] { "*.exe" }
+					},
+					new FilePickerFileType("All Files")
+					{
+						Patterns = new[] { "*" }
+					}
+				}
+				});
 
-            await messageBox.ShowAsync();
-        }
-
-
-
-        private void HandAttachErrors()
-        {
-            if (AttachedProcess.Error)
-            {
-                ShowPopup("Error", "An error occured while trying to attach to the process.", Icon.Error);
-            }
-            else
-            {
-
-
-                //Different popups for different errors
-                if (AttachedProcess.IsIL2CPP)
-                {
-                    ShowPopup("Error", "IL2CPP is not currently supported, please select a non IL2CPP Unity Game.", Icon.Error);
-                }
-                else if (!AttachedProcess.HasBepInExInstalled)
-                {
-                    ShowPopup("Error", "You should install BepInEx v6.0.0 before running this tool.", Icon.Error);
-                }
-            }
-        }
+				//User selected a file
+				if (files != null && files.Count > 0)
+				{
+					var selectedFile = files[0].Path.LocalPath;
 
 
-        //Update the connection text
-        public static void ChangeConnectedText(bool connected)
-        {
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
-            {
-                uiManager.mainWindow.connectedText.Text = connected ? "Connected" : "Disconnected";
-                //we also clear the hierarchy view
-                uiManager.mainWindow.HierarchyTreeView.ItemsSource = null;
-            });
-        }
+					AttachedProcess.AttachToProcess(selectedFile);
 
 
+					HandAttachErrors();
 
-        //Connect button event
-        private void ConnectButtonPressed(object? sender, EventArgs e)
-        {
-            if(mainWindow.IpText.Text == null || mainWindow.PortText.Text == null)
-            {
-                return;
-            }
-            ConfigManager.SaveIPPort(mainWindow.IpText.Text, mainWindow.PortText.Text);
-            Connection.AttemptConnection(mainWindow.IpText.Text, int.Parse(mainWindow.PortText.Text));
-        }
+					if (AttachedProcess.IsAttached)
+					{
+						mainWindow.ProcessTextBlock.Text = $"Attached to: {AttachedProcess.ProcessName}";
 
-        //Disconnect button event
-        private void DisconnectButtonPressed(object? sender, EventArgs e)
-        {
-            Connection.Disconnect();
-        }
+						//put the dll in the plugins folder
+					}
+					else
+					{
 
-        //Fetch hierarchy button event
-        private void FetchHirarchyPressed(object? sender, EventArgs e)
-        {
-            Connection.FetchHierarchy();
-        }
+						mainWindow.ProcessTextBlock.Text = "Failed to attach";
 
+					}
 
-        
-        public static void UpdateHierarchyView(HierarchyNode root)
-        {
-            uiManager.mainWindow.HierarchyTreeView.ItemsSource = new List<HierarchyNode> { root };
-        }
+					//Console.WriteLine($"Selected file: {selectedFile}");
+				}
+			}
+			else
+			{
+				Debug.WriteLine("StorageProvider is not available.");
+				ShowPopup("Error", "Could not start the file browser.", Icon.Error);
+			}
+		}
 
 
 
-        private void SelectedHierachyNode(object? sender, EventArgs e)
-        {
-            if (mainWindow.HierarchyTreeView.SelectedItem is HierarchyNode selectedNode)
-            {
-                HierachyHandler.SelectedNode(selectedNode);
-            }
-        }
+
+		/// <summary>
+		/// Show a popup error message
+		/// </summary>
+		/// <param name="title">Error box tittle</param>
+		/// <param name="message">Error box message</param>
+		public static async void ShowPopup(string title, string message, Icon icon)
+		{
+			var messageBox = MessageBoxManager
+				.GetMessageBoxStandard(title, message, ButtonEnum.Ok, icon);
+
+			await messageBox.ShowAsync();
+		}
 
 
+
+		private void HandAttachErrors()
+		{
+			if (AttachedProcess.Error)
+			{
+				ShowPopup("Error", "An error occured while trying to attach to the process.", Icon.Error);
+			}
+			else
+			{
+
+
+				//Different popups for different errors
+				if (AttachedProcess.IsIL2CPP)
+				{
+					ShowPopup("Error", "IL2CPP is not currently supported, please select a non IL2CPP Unity Game.", Icon.Error);
+				}
+				else if (!AttachedProcess.HasBepInExInstalled)
+				{
+					ShowPopup("Error", "You should install BepInEx v6.0.0 before running this tool.", Icon.Error);
+				}
+			}
+		}
+
+
+		//Update the connection text
+		public static void ChangeConnectedText(bool connected)
+		{
+			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+			{
+				uiManager.mainWindow.ConnectedText.Text = connected ? "Connected" : "Disconnected";
+				//we also clear the hierarchy view
+				uiManager.mainWindow.HierarchyTreeView.ItemsSource = null;
+			});
+		}
+
+
+
+		//Connect button event
+		private void ConnectButtonPressed(object? sender, EventArgs e)
+		{
+			if (mainWindow.IpText.Text == null || mainWindow.PortText.Text == null)
+			{
+				return;
+			}
+			ConfigManager.SaveIPPort(mainWindow.IpText.Text, mainWindow.PortText.Text);
+			Connection.AttemptConnection(mainWindow.IpText.Text, int.Parse(mainWindow.PortText.Text));
+		}
+
+		//Disconnect button event
+		private void DisconnectButtonPressed(object? sender, EventArgs e)
+		{
+			Connection.Disconnect();
+		}
+
+		//Fetch hierarchy button event
+		private void FetchHirarchyPressed(object? sender, EventArgs e)
+		{
+			Connection.FetchHierarchy();
+		}
+
+
+
+		public static void UpdateHierarchyView(HierarchyNode root)
+		{
+			uiManager.mainWindow.HierarchyTreeView.ItemsSource = new List<HierarchyNode> { root };
+		}
+
+
+
+		private void SelectedHierachyNode(object? sender, EventArgs e)
+		{
+			if (mainWindow.HierarchyTreeView.SelectedItem is HierarchyNode selectedNode)
+			{
+				HierachyHandler.SelectedNode(selectedNode);
+			}
+		}
 
 
 
@@ -194,22 +186,24 @@ namespace UnityPeek.UI
 
 
 
-        public void Start()
-        {
-            //Load or create config
-            ConfigManager.LoadConfig();
-            Debug.WriteLine("App has booted successfully!");
-
-            //Set the values inside the window
-            mainWindow.IpText.Text = ConfigManager.IP;
-            mainWindow.PortText.Text = ConfigManager.port;
 
 
+		public void Start()
+		{
+			//Load or create config
+			ConfigManager.LoadConfig();
+			Debug.WriteLine("App has booted successfully!");
 
-            
+			//Set the values inside the window
+			mainWindow.IpText.Text = ConfigManager.IP;
+			mainWindow.PortText.Text = ConfigManager.port;
 
 
-            /*
+
+
+
+
+			/*
 
             _statusTextBlock.Text = "yoyoyo";
 
@@ -256,7 +250,7 @@ namespace UnityPeek.UI
             }
 
             */
-            /*
+			/*
             int index = 4;
             _outputTextBlock.Text = module.MainModule.Types[index].Name;
             foreach (var method in module.MainModule.Types[index].Methods)
@@ -309,8 +303,8 @@ namespace UnityPeek.UI
 
 
 
-        }
+		}
 
-        
-    }
+
+	}
 }
