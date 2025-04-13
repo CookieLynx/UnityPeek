@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Text;
 
 namespace UnityPeek
@@ -9,6 +10,23 @@ namespace UnityPeek
 	//Helper class
 	class Helpers
 	{
+
+		public static Vector3 GetQuaternionEulerAngle(Quaternion q)
+		{
+			float x = q.X;
+			float y = q.Y;
+			float z = q.Z;
+			float w = q.W;
+
+			float rollX = MathF.Atan2(2.0f * (w * x + y * z), 1.0f - 2.0f * (x * x + y * y));
+			float pitchY = MathF.Asin(2.0f * (w * y - z * x));
+			float yawZ = MathF.Atan2(2.0f * (w * z + x * y), 1.0f - 2.0f * (y * y + z * z));
+			return new Vector3(rollX, pitchY, yawZ);
+
+		}
+
+
+
 		[Serializable]
 		public class HierachyStructure
 		{

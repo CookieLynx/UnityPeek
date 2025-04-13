@@ -3,7 +3,7 @@
 		xmlns:local="clr-namespace:UnityPeek"
 		xmlns:avt="clr-namespace:Avalonia.Controls.Templates;assembly=Avalonia.Controls"
         x:Class="UnityPeek.MainWindow"
-        Width="1600" Height="1200" Title="UnityPeek">
+        Width="1000" Height="1000" Title="UnityPeek">
 
 	<Grid>
 		<!-- Row definitions for header and content -->
@@ -144,7 +144,40 @@
 			
 
 			<!-- Right Side -->
-			<Border Background="#777" Grid.Column="1"/>
+			<Border Background="#777" Grid.Column="1" Padding="10">
+				<StackPanel Spacing="10">
+					<!-- Position Row -->
+					<StackPanel>
+						<TextBlock Text="Position" Foreground="White" Margin="0,0,0,5" HorizontalAlignment="Center"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+							<TextBlock x:Name="PositionX" Width="60" Text="X" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="PositionY" Width="60" Text="Y" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="PositionZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
+						</StackPanel>
+					</StackPanel>
+
+					<!-- Rotation Row -->
+					<StackPanel>
+						<TextBlock Text="Rotation" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+							<TextBlock x:Name="RotationX" Width="60" Text="X" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="RotationY" Width="60" Text="Y" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="RotationZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
+						</StackPanel>
+					</StackPanel>
+
+					<!-- Scale Row -->
+					<StackPanel>
+						<TextBlock Text="Scale" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Center"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+							<TextBlock x:Name="ScaleX" Width="60" Text="X" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="ScaleY" Width="60" Text="Y" Background="#444" Foreground="White"/>
+							<TextBlock x:Name="ScaleZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
+						</StackPanel>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+			
 		</Grid>
 	</Grid>
 </Window>

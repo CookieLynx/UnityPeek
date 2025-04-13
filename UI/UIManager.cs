@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -181,6 +182,22 @@ namespace UnityPeek.UI
 		}
 
 
+		public static void UpdateSelectedNodeTransform(Vector3 position, Quaternion rotation, Vector3 scale)
+		{
+			Vector3 roationVector = Helpers.GetQuaternionEulerAngle(rotation);
+			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+			{
+				uiManager.mainWindow.PositionX.Text = "X:" + position.X;
+				uiManager.mainWindow.PositionY.Text = "Y:" + position.Y;
+				uiManager.mainWindow.PositionZ.Text = "Z:" + position.Z;
+				uiManager.mainWindow.RotationX.Text = "X:" + roationVector.X;
+				uiManager.mainWindow.RotationY.Text = "Y:" + roationVector.Y;
+				uiManager.mainWindow.RotationZ.Text = "Z:" + roationVector.Z;
+				uiManager.mainWindow.ScaleX.Text = "X:" + scale.X;
+				uiManager.mainWindow.ScaleY.Text = "Y:" + scale.X;
+				uiManager.mainWindow.ScaleZ.Text = "Z:" + scale.X;
+			});
+		}
 
 
 
@@ -199,6 +216,7 @@ namespace UnityPeek.UI
 			mainWindow.PortText.Text = ConfigManager.port;
 
 
+			
 
 
 

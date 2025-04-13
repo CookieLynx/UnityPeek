@@ -191,9 +191,14 @@ namespace UnityPeek
 						float scaleZ = reader.ReadSingle();
 
 						// Log the decoded values for debugging
+
+						Debug.WriteLine("TIMESTAMP: " + posX);
+
 						Debug.WriteLine($"Position: ({posX}, {posY}, {posZ})");
 						Debug.WriteLine($"Rotation: ({rotX}, {rotY}, {rotZ}, {rotW})");
 						Debug.WriteLine($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
+
+						//UIManager.UpdateSelectedNodeTransform(new System.Numerics.Vector3(posX, posY, posZ), new System.Numerics.Quaternion(rotX, rotY, rotZ, rotW), new System.Numerics.Vector3(scaleX, scaleY, scaleZ));
 					}
 				}
 			}
