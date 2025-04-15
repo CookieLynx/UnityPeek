@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using MsBox.Avalonia.Enums;
@@ -114,8 +115,15 @@ namespace UnityPeek
 							Debug.WriteLine("Data Available");
 
 
+							var (typeId, messageLength) = ReadMessageLengthAndType(stream);
+
+
+							if (typeId == -1 || messageLength == -1) continue;
+
 							//Get the message type
-							int typeId = ReadMessageType(stream);
+							//int typeId = ReadMessageType(stream);
+
+							Debug.WriteLine("OUR TYPE ID: " + typeId);
 
 							if(typeId == -1)
 							{
@@ -192,13 +200,14 @@ namespace UnityPeek
 
 						// Log the decoded values for debugging
 
-						Debug.WriteLine("TIMESTAMP: " + posX);
+						//Debug.WriteLine("TIMESTAMP: " + posX);
 
 						Debug.WriteLine($"Position: ({posX}, {posY}, {posZ})");
-						Debug.WriteLine($"Rotation: ({rotX}, {rotY}, {rotZ}, {rotW})");
+						Quaternion q = new Quaternion(rotX, rotY, rotZ, rotW);
+						Debug.WriteLine($"Rotation: ({Helpers.GetQuaternionEulerAngle(q)})");
 						Debug.WriteLine($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
 
-						//UIManager.UpdateSelectedNodeTransform(new System.Numerics.Vector3(posX, posY, posZ), new System.Numerics.Quaternion(rotX, rotY, rotZ, rotW), new System.Numerics.Vector3(scaleX, scaleY, scaleZ));
+						UIManager.UpdateSelectedNodeTransform(new System.Numerics.Vector3(posX, posY, posZ), new System.Numerics.Quaternion(rotX, rotY, rotZ, rotW), new System.Numerics.Vector3(scaleX, scaleY, scaleZ));
 					}
 				}
 			}
@@ -230,7 +239,7 @@ namespace UnityPeek
 
 
 
-
+		/*
 		/// <summary>
 		/// Reads the first 4 bytes of a message to get type ID (0 for string, 1 for Hierarchy data)
 		/// </summary>
@@ -238,13 +247,45 @@ namespace UnityPeek
 		/// <returns></returns>
 		private static int ReadMessageType(NetworkStream stream)
 		{
+			Debug.WriteLine("HERE 1");
 			byte[] typeBuffer = new byte[4]; // First 4 bytes = type ID
+			Debug.WriteLine("HERE 2");
 			int output = stream.Read(typeBuffer, 0, typeBuffer.Length);
+			Debug.WriteLine("HERE 3");
 
 			if (output <= 0) return -1;
+			Debug.WriteLine("HERE 4");
 
 			int typeId = BitConverter.ToInt32(typeBuffer, 0);
+			Debug.WriteLine("HERE 5");
 			return typeId;
+		}
+		*/
+
+		/// <summary>
+		/// Reads the first 4 bytes of a message to get its length not including those 4 bytes
+		/// </summary>
+		/// <param name="stream">Network Stream</param>
+		/// <returns></returns>
+		private static (int typeId, int messageLength) ReadMessageLengthAndType(NetworkStream stream)
+		{
+			byte[] headerBuffer = new byte[8];
+
+			int totalRead = 0;
+			while (totalRead < 8)
+			{
+				Debug.WriteLine("HERE TOTAL READ: " + totalRead);
+				int bytesRead = stream.Read(headerBuffer, totalRead, 8 - totalRead);
+				if (bytesRead == 0) return (-1, -1); // Stream closed
+				totalRead += bytesRead;
+			}
+
+			int length = BitConverter.ToInt32(headerBuffer, 0);
+			int typeId = BitConverter.ToInt32(headerBuffer, 4);
+
+			if (length < 4) return (-1, -1);
+
+			return (typeId, length);
 		}
 
 		/// <summary>
