@@ -13,17 +13,36 @@ namespace UnityPeek
 
 		public static Vector3 GetQuaternionEulerAngle(Quaternion q)
 		{
-			float x = q.X;
-			float y = q.Y;
-			float z = q.Z;
-			float w = q.W;
+			Vector3 angles = new Vector3();
 
-			float rollX = MathF.Atan2(2.0f * (w * x + y * z), 1.0f - 2.0f * (x * x + y * y));
-			float pitchY = MathF.Asin(2.0f * (w * y - z * x));
-			float yawZ = MathF.Atan2(2.0f * (w * z + x * y), 1.0f - 2.0f * (y * y + z * z));
-			return new Vector3(rollX, pitchY, yawZ);
+			// Roll (X-axis rotation)
+			double sinr_cosp = 2 * (q.W * q.X + q.Y * q.Z);
+			double cosr_cosp = 1 - 2 * (q.X * q.X + q.Y * q.Y);
+			angles.X = (float)Math.Atan2(sinr_cosp, cosr_cosp);
+
+			// Pitch (Y-axis rotation)
+			double sinp = 2 * (q.W * q.Y - q.Z * q.X);
+			if (Math.Abs(sinp) >= 1)
+				angles.Y = (float)(Math.CopySign(Math.PI / 2, sinp)); // use 90 degrees if out of range
+			else
+				angles.Y = (float)Math.Asin(sinp);
+
+			// Yaw (Z-axis rotation)
+			double siny_cosp = 2 * (q.W * q.Z + q.X * q.Y);
+			double cosy_cosp = 1 - 2 * (q.Y * q.Y + q.Z * q.Z);
+			angles.Z = (float)Math.Atan2(siny_cosp, cosy_cosp);
+
+			// Convert from radians to degrees
+			angles.X = ToDegrees(angles.X);
+			angles.Y = ToDegrees(angles.Y);
+			angles.Z = ToDegrees(angles.Z);
+
+			return angles;
 
 		}
+
+		public static float ToDegrees(float radians) => radians * (180f / (float)Math.PI);
+		public static float ToDegrees(double radians) => (float)(radians * (180.0 / Math.PI));
 
 
 

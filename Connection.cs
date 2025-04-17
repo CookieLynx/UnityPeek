@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading;
 using MsBox.Avalonia.Enums;
+using UnityPeek.Handlers;
 using UnityPeek.UI;
 
 namespace UnityPeek
@@ -138,7 +139,7 @@ namespace UnityPeek
 							}
 							else if (typeId == 3)
 							{
-								ReadTransformData(stream);
+								InspectorHandler.ReadTransformData(stream);
 							}
 							else
 							{
@@ -169,53 +170,7 @@ namespace UnityPeek
 			}
 		}
 
-		private static void ReadTransformData(NetworkStream stream)
-		{
-			// Buffer to hold the incoming data
-			byte[] buffer = new byte[40]; // 40 bytes: 3 floats for position, 4 floats for rotation, 3 floats for scale (4 bytes each)
-
-			// Read the data from the stream
-			int bytesRead = stream.Read(buffer, 0, buffer.Length);
-			if (bytesRead == buffer.Length)
-			{
-				using (MemoryStream memoryStream = new MemoryStream(buffer))
-				{
-					using (BinaryReader reader = new BinaryReader(memoryStream))
-					{
-						// Read position
-						float posX = reader.ReadSingle();
-						float posY = reader.ReadSingle();
-						float posZ = reader.ReadSingle();
-
-						// Read rotation
-						float rotX = reader.ReadSingle();
-						float rotY = reader.ReadSingle();
-						float rotZ = reader.ReadSingle();
-						float rotW = reader.ReadSingle();
-
-						// Read scale
-						float scaleX = reader.ReadSingle();
-						float scaleY = reader.ReadSingle();
-						float scaleZ = reader.ReadSingle();
-
-						// Log the decoded values for debugging
-
-						//Debug.WriteLine("TIMESTAMP: " + posX);
-
-						Debug.WriteLine($"Position: ({posX}, {posY}, {posZ})");
-						Quaternion q = new Quaternion(rotX, rotY, rotZ, rotW);
-						Debug.WriteLine($"Rotation: ({Helpers.GetQuaternionEulerAngle(q)})");
-						Debug.WriteLine($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
-
-						UIManager.UpdateSelectedNodeTransform(new System.Numerics.Vector3(posX, posY, posZ), new System.Numerics.Quaternion(rotX, rotY, rotZ, rotW), new System.Numerics.Vector3(scaleX, scaleY, scaleZ));
-					}
-				}
-			}
-			else
-			{
-				Debug.WriteLine("Error: Incomplete transform data received.");
-			}
-		}
+		
 
 
 
@@ -328,6 +283,11 @@ namespace UnityPeek
 				//I dont think this can trigger but just in case
 				UIManager.ShowPopup("Error", "You are not connected to a game", Icon.Error);
 			}
+		}
+
+		public static void SendToggleTransformActive(int id, bool enabled)
+		{
+			messageToSend = "ToggleTransformActive:" + id + ":" + enabled;
 		}
 
 		/// <summary>

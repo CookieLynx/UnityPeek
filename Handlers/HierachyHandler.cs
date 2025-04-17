@@ -6,11 +6,11 @@ using System.Linq;
 using System.Net.Sockets;
 using UnityPeek.UI;
 
-namespace UnityPeek
+namespace UnityPeek.Handlers
 {
 	class HierachyHandler
 	{
-		private static int selectedID = -1;
+		private static int selectedTransformID = -1;
 
 
 
@@ -136,9 +136,15 @@ namespace UnityPeek
 
 		public static void SelectedNode(HierarchyNode selectedNode)
 		{
-			selectedID = selectedNode.Id;
-			Connection.SendSelectedNode(selectedID);
+			selectedTransformID = selectedNode.Id;
+			Connection.SendSelectedNode(selectedTransformID);
 			Debug.WriteLine($"Selected node: {selectedNode.Name}");
+		}
+
+
+		public static void SendToggleTransformActive(bool isActive)
+		{
+			Connection.SendToggleTransformActive(selectedTransformID, isActive);
 		}
 	}
 }

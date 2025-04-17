@@ -18,6 +18,8 @@ public partial class MainWindow : Window
 	public TextBlock ConnectedText => this.FindControl<TextBlock>("ConnectionStatus");
 
 	public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked, FetchHirarchyClicked, SelectedHierachyNode;
+
+	public event EventHandler<bool> EnabledCheckedBoxChanged;
 	public MainWindow()
 	{
 		InitializeComponent();
@@ -43,6 +45,11 @@ public partial class MainWindow : Window
 		PortText.LostFocus += (sender, e) =>
 		{
 			PortText.SetValue(TextBox.ForegroundProperty, Brushes.White);
+		};
+
+		EnabledCheckedBox.Click += (sender, e) =>
+		{
+			EnabledCheckedBoxChanged?.Invoke(sender, (bool)EnabledCheckedBox.IsChecked);
 		};
 	}
 

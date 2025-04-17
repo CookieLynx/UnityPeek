@@ -4,6 +4,7 @@ using System.Numerics;
 using Avalonia.Platform.Storage;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using UnityPeek.Handlers;
 using Debug = System.Diagnostics.Debug;
 
 
@@ -23,6 +24,7 @@ namespace UnityPeek.UI
 			mainWindow.ConnectButtonClicked += ConnectButtonPressed;
 			mainWindow.DisconnectButtonClicked += DisconnectButtonPressed;
 			mainWindow.FetchHirarchyClicked += FetchHirarchyPressed;
+            mainWindow.EnabledCheckedBoxChanged += (sender, isEnabled) => InspectorHandler.EnabledCheckedBoxChanged(isEnabled);
 			mainWindow.SelectedHierachyNode += SelectedHierachyNode;
 			uiManager = this;
 		}
@@ -166,6 +168,13 @@ namespace UnityPeek.UI
 
 
 
+
+
+
+
+
+
+
 		public static void UpdateHierarchyView(HierarchyNode root)
 		{
 			uiManager.mainWindow.HierarchyTreeView.ItemsSource = new List<HierarchyNode> { root };
@@ -182,11 +191,13 @@ namespace UnityPeek.UI
 		}
 
 
-		public static void UpdateSelectedNodeTransform(Vector3 position, Quaternion rotation, Vector3 scale)
+		public static void UpdateSelectedNodeTransform(string name, bool enabled, Vector3 position, Quaternion rotation, Vector3 scale)
 		{
 			Vector3 roationVector = Helpers.GetQuaternionEulerAngle(rotation);
 			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
 			{
+				uiManager.mainWindow.ObjectName.Text = name;
+				uiManager.mainWindow.EnabledCheckedBox.IsChecked = enabled;
 				uiManager.mainWindow.PositionX.Text = "X:" + position.X;
 				uiManager.mainWindow.PositionY.Text = "Y:" + position.Y;
 				uiManager.mainWindow.PositionZ.Text = "Z:" + position.Z;

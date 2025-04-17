@@ -146,10 +146,20 @@
 			<!-- Right Side -->
 			<Border Background="#777" Grid.Column="1" Padding="10">
 				<StackPanel Spacing="10">
+					<DockPanel>
+
+						<CheckBox x:Name="EnabledCheckedBox" IsChecked="True"></CheckBox>
+						<TextBlock x:Name="ObjectName" Width="190" Text="Name" Background="#444" Foreground="White" HorizontalAlignment="Left"/>
+						<Button x:Name="DeleteButton" Width="30" Height="30" Margin="0,0,5,0" Background="Red" Click="AttachButton_Click" HorizontalAlignment="Right">
+							>
+							<!-- Icon or content can go here -->
+						</Button>
+						
+					</DockPanel>
 					<!-- Position Row -->
 					<StackPanel>
-						<TextBlock Text="Position" Foreground="White" Margin="0,0,0,5" HorizontalAlignment="Center"/>
-						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+						<TextBlock Text="Position" Foreground="White" Margin="0,0,0,5" HorizontalAlignment="Left"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left">
 							<TextBlock x:Name="PositionX" Width="60" Text="X" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="PositionY" Width="60" Text="Y" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="PositionZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
@@ -158,8 +168,8 @@
 
 					<!-- Rotation Row -->
 					<StackPanel>
-						<TextBlock Text="Rotation" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+						<TextBlock Text="Rotation" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Left"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left">
 							<TextBlock x:Name="RotationX" Width="60" Text="X" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="RotationY" Width="60" Text="Y" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="RotationZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
@@ -168,8 +178,8 @@
 
 					<!-- Scale Row -->
 					<StackPanel>
-						<TextBlock Text="Scale" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Center"/>
-						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center">
+						<TextBlock Text="Scale" Foreground="White" Margin="0,10,0,5" HorizontalAlignment="Left"/>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Left">
 							<TextBlock x:Name="ScaleX" Width="60" Text="X" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="ScaleY" Width="60" Text="Y" Background="#444" Foreground="White"/>
 							<TextBlock x:Name="ScaleZ" Width="60" Text="Z" Background="#444" Foreground="White"/>
