@@ -100,6 +100,11 @@
 			messageToSend = "ToggleTransformActive:" + id + ":" + enabled;
 		}
 
+		public static void DeleteSelectedNode(int id)
+		{
+			messageToSend = "DeleteSelectedNode:" + id;
+		}
+
 		private static void StartClient()
 		{
 			// check if we have disconnected from the server

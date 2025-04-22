@@ -57,14 +57,12 @@
 		public static void SelectedNode(HierarchyNode selectedNode)
 		{
 			selectedTransformID = selectedNode.Id;
+			InspectorHandler.selectedTransformID = selectedNode.Id;
 			Connection.SendSelectedNode(selectedTransformID);
 			UIManager.LogMessage($"Selected node: {selectedNode.Name}");
 		}
 
-		public static void SendToggleTransformActive(bool isActive)
-		{
-			Connection.SendToggleTransformActive(selectedTransformID, isActive);
-		}
+		
 
 		public static void GatherHierarchyChunkData(NetworkStream stream)
 		{
@@ -127,7 +125,17 @@
 		{
 			UIManager.LogMessage("Decoding");
 			Helpers.HierachyStructure root = Helpers.DeserializeHierarchy(array);
+			CreateJsonFromHierachy(array);
 			return root;
+		}
+
+
+		private static void CreateJsonFromHierachy(byte[] array)
+		{
+			string json = System.Text.Json.JsonSerializer.Serialize(array);
+			string filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Hierarchy.json");
+			File.WriteAllText(filePath, json);
+			UIManager.LogMessage("Hierarchy JSON saved to: " + filePath);
 		}
 	}
 }

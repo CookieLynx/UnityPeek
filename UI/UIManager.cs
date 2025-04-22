@@ -3,6 +3,7 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Numerics;
+	using System.Xml.Linq;
 	using Avalonia.Platform.Storage;
 	using MsBox.Avalonia;
 	using MsBox.Avalonia.Enums;
@@ -14,6 +15,7 @@
 		public static UIManager UIManagerSingleton;
 
 		private MainWindow mainWindow;
+
 		public enum LogType 
 		{
 			Message,
@@ -33,6 +35,7 @@
 			mainWindow.FetchHirarchyClicked += this.FetchHirarchyPressed;
 			mainWindow.EnabledCheckedBoxChanged += (sender, isEnabled) => InspectorHandler.EnabledCheckedBoxChanged(isEnabled);
 			mainWindow.SelectedHierachyNode += this.SelectedHierachyNode;
+			mainWindow.DeleteButtonPressed += this.DeleteButtonPressed;
 			UIManagerSingleton = this;
 		}
 
@@ -41,14 +44,17 @@
 			TimeOnly time = TimeOnly.FromDateTime(DateTime.Now);
 			string timeString = time.ToString("HH:mm:ss");
 			Debug.WriteLine(message);
-			if (UIManagerSingleton.mainWindow.LogTextBox.Text == null)
+			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
 			{
-				UIManagerSingleton.mainWindow.LogTextBox.Text = type.ToString() + " " + timeString + " - " + message;
-			}
-			else
-			{
-				UIManagerSingleton.mainWindow.LogTextBox.Text = UIManagerSingleton.mainWindow.LogTextBox.Text + "\n" + type.ToString() + " " + timeString + " - " + message;
-			}
+				if (UIManagerSingleton.mainWindow.LogTextBox.Text == null)
+				{
+					UIManagerSingleton.mainWindow.LogTextBox.Text = type.ToString() + " " + timeString + " - " + message;
+				}
+				else
+				{
+					UIManagerSingleton.mainWindow.LogTextBox.Text = UIManagerSingleton.mainWindow.LogTextBox.Text + "\n" + type.ToString() + " " + timeString + " - " + message;
+				}
+			});
 		}
 
 		/// <summary>
@@ -68,6 +74,7 @@
 		// Update the connection text
 		public static void ChangeConnectedText(bool connected)
 		{
+
 			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
 			{
 				UIManagerSingleton.mainWindow.ConnectedText.Text = connected ? "Connected" : "Disconnected";
@@ -82,11 +89,20 @@
 			UIManagerSingleton.mainWindow.HierarchyTreeView.ItemsSource = new List<HierarchyNode> { root };
 		}
 
+		public static void ClearSelectedNode()
+		{
+			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+			{
+				UIManagerSingleton.mainWindow.Inspector.IsVisible = false;
+			});
+		}
+
 		public static void UpdateSelectedNodeTransform(string name, bool enabled, Vector3 position, Quaternion rotation, Vector3 scale)
 		{
 			Vector3 roationVector = Helpers.GetQuaternionEulerAngle(rotation);
 			Avalonia.Threading.Dispatcher.UIThread.Post(() =>
 			{
+				UIManagerSingleton.mainWindow.Inspector.IsVisible = true;
 				UIManagerSingleton.mainWindow.ObjectName.Text = name;
 				UIManagerSingleton.mainWindow.EnabledCheckedBox.IsChecked = enabled;
 				UIManagerSingleton.mainWindow.PositionX.Text = "X:" + position.X;
@@ -110,7 +126,7 @@
 			// Set the values inside the window
 			this.mainWindow.IpText.Text = ConfigManager.IP;
 			this.mainWindow.PortText.Text = ConfigManager.Port;
-
+			ClearSelectedNode();
 			/*
 
 			_statusTextBlock.Text = "yoyoyo";
@@ -300,7 +316,24 @@
 		// Fetch hierarchy button event
 		private void FetchHirarchyPressed(object? sender, EventArgs e)
 		{
+			ClearSelectedNode();
 			Connection.FetchHierarchy();
+		}
+
+		private async void DeleteButtonPressed(object? sender, EventArgs e)
+		{
+			// Show confirmation dialog and await result
+			var result = await MessageBoxManager
+				.GetMessageBoxStandard("Delete Confirmation", "Are you sure you want to delete this object?", ButtonEnum.YesNo, Icon.Warning)
+				.ShowAsync();
+
+			if (result != ButtonResult.Yes)
+			{
+				return;
+			}
+
+			InspectorHandler.DeleteSelectedNode();
+			ClearSelectedNode();
 		}
 
 		private void SelectedHierachyNode(object? sender, EventArgs e)

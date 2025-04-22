@@ -12,6 +12,8 @@
 
     public class InspectorHandler
     {
+		public static int selectedTransformID = -1;
+
 		public static void ReadTransformData(NetworkStream stream)
 		{
 			// Temporary memory stream to hold incoming data
@@ -78,9 +80,23 @@
 			}
 		}
 
+		public static void SendToggleTransformActive(bool isActive)
+		{
+			Connection.SendToggleTransformActive(selectedTransformID, isActive);
+		}
+
 		public static void EnabledCheckedBoxChanged(bool isEnabled)
 		{
-			HierachyHandler.SendToggleTransformActive(isEnabled);
+			InspectorHandler.SendToggleTransformActive(isEnabled);
+		}
+
+		public static void DeleteSelectedNode()
+		{
+			UIManager.ClearSelectedNode();
+			Connection.DeleteSelectedNode(selectedTransformID);
+			//wait for a second
+			System.Threading.Thread.Sleep(250); // this is probably overkill
+			Connection.FetchHierarchy();
 		}
 	}
 }

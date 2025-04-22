@@ -62,6 +62,8 @@ namespace UnityPeek
 
 		public event EventHandler? SelectedHierachyNode;
 
+		public event EventHandler? DeleteButtonPressed;
+
 		public event EventHandler<bool>? EnabledCheckedBoxChanged;
 
 		public TextBlock OutputDisplay => this.FindControl<TextBlock>("OutputTextBlock") !;
@@ -100,6 +102,11 @@ namespace UnityPeek
 		private void HierarchyTreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
 			this.SelectedHierachyNode!.Invoke(sender, e);
+		}
+
+		private void DeleteButton_Click(object? sender, RoutedEventArgs e)
+		{
+			this.DeleteButtonPressed?.Invoke(sender, e);
 		}
 	}
 }
