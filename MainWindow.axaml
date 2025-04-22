@@ -12,6 +12,7 @@
 			<!-- Header bar height -->
 			<RowDefinition Height="40"/>
 			<RowDefinition Height="40"/>
+			<RowDefinition Height="700"/>
 			<RowDefinition Height="*"/>
 			
 			<!-- Split screen content -->
@@ -40,6 +41,7 @@
 					TextWrapping="Wrap" />
 			</DockPanel>
 		</Border>
+		
 		<Border Grid.Row="1" Background="#333" Padding="0" >
 			<DockPanel>
 				<!-- Read-only TextBox -->
@@ -187,7 +189,23 @@
 					</StackPanel>
 				</StackPanel>
 			</Border>
-			
 		</Grid>
+
+		<Border Grid.Row="4" Background="#333" Padding="5">
+			<DockPanel LastChildFill="True">
+				<TextBox
+					Name="LogTextBox"
+					Background="Transparent"
+					Foreground="White"
+					BorderThickness="2"
+					IsReadOnly="True"
+					TextWrapping="Wrap"
+					ScrollViewer.VerticalScrollBarVisibility="Auto"
+					ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+					AcceptsReturn="True"
+					FontFamily="Consolas"
+					FontSize="16"/>
+			</DockPanel>
+		</Border>
 	</Grid>
 </Window>

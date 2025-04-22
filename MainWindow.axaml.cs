@@ -1,85 +1,105 @@
-using System;
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Media;
-
-namespace UnityPeek;
-
-public partial class MainWindow : Window
+namespace UnityPeek
 {
-	public TextBlock OutputDisplay => this.FindControl<TextBlock>("OutputTextBlock");
-	public TextBlock MethodsDisplay => this.FindControl<TextBlock>("MethodsTextBlock");
+	using System;
+	using Avalonia.Controls;
+	using Avalonia.Interactivity;
+	using Avalonia.Media;
 
-	public TextBlock ProcessTextBlock => this.FindControl<TextBlock>("ProcessText");
-
-	public TextBox IpText => this.FindControl<TextBox>("IP");
-	public TextBox PortText => this.FindControl<TextBox>("Port");
-
-	public TextBlock ConnectedText => this.FindControl<TextBlock>("ConnectionStatus");
-
-	public event EventHandler? AttachButtonClicked, ConnectButtonClicked, DisconnectButtonClicked, FetchHirarchyClicked, SelectedHierachyNode;
-
-	public event EventHandler<bool> EnabledCheckedBoxChanged;
-	public MainWindow()
+	public partial class MainWindow : Window
 	{
-		InitializeComponent();
-
-		HierarchyTreeView.SelectionChanged += HierarchyTreeView_SelectionChanged;
-
-		//Change of text color when box is selected
-		IpText.GotFocus += (sender, e) =>
+		public MainWindow()
 		{
-			IpText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
-		};
+			this.InitializeComponent();
 
-		IpText.LostFocus += (sender, e) =>
+			this.HierarchyTreeView.SelectionChanged += this.HierarchyTreeView_SelectionChanged;
+
+			// Change of text color when box is selected
+			this.IpText.GotFocus += (sender, e) =>
+			{
+				this.IpText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+			};
+
+			this.IpText.LostFocus += (sender, e) =>
+			{
+				this.IpText.SetValue(TextBox.ForegroundProperty, Brushes.White);
+			};
+
+			this.PortText.GotFocus += (sender, e) =>
+			{
+				this.PortText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+			};
+
+			this.PortText.LostFocus += (sender, e) =>
+			{
+				this.PortText.SetValue(TextBox.ForegroundProperty, Brushes.White);
+			};
+
+			this.EnabledCheckedBox.Click += (sender, e) =>
+			{
+				this.EnabledCheckedBoxChanged?.Invoke(sender, (bool)this.EnabledCheckedBox.IsChecked!);
+			};
+
+			this.LogTextBox.GotFocus += (sender, e) =>
+			{
+				this.LogTextBox.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+				//this.LogTextBox.SetValue(TextBox.BackgroundProperty, Brushes.Black);
+			};
+
+			this.LogTextBox.LostFocus += (sender, e) =>
+			{
+				this.LogTextBox.SetValue(TextBox.ForegroundProperty, Brushes.White);
+				//this.LogTextBox.SetValue(TextBox.BackgroundProperty, Brushes.Black);
+			};
+		}
+
+		public event EventHandler? AttachButtonClicked;
+
+		public event EventHandler? ConnectButtonClicked;
+
+		public event EventHandler? DisconnectButtonClicked;
+
+		public event EventHandler? FetchHirarchyClicked;
+
+		public event EventHandler? SelectedHierachyNode;
+
+		public event EventHandler<bool>? EnabledCheckedBoxChanged;
+
+		public TextBlock OutputDisplay => this.FindControl<TextBlock>("OutputTextBlock") !;
+
+		public TextBlock MethodsDisplay => this.FindControl<TextBlock>("MethodsTextBlock") !;
+
+		public TextBlock ProcessTextBlock => this.FindControl<TextBlock>("ProcessText") !;
+
+		public TextBox IpText => this.FindControl<TextBox>("IP") !;
+
+		public TextBox PortText => this.FindControl<TextBox>("Port") !;
+
+		public TextBlock ConnectedText => this.FindControl<TextBlock>("ConnectionStatus") !;
+
+		// All the button events
+		private void AttachButton_Click(object? sender, RoutedEventArgs e)
 		{
-			IpText.SetValue(TextBox.ForegroundProperty, Brushes.White);
-		};
+			this.AttachButtonClicked?.Invoke(sender, e);
+		}
 
-		PortText.GotFocus += (sender, e) =>
+		private void ConnectButton_Click(object? sender, RoutedEventArgs e)
 		{
-			PortText.SetValue(TextBox.ForegroundProperty, Brushes.Black);
-		};
+			this.ConnectButtonClicked?.Invoke(sender, e);
+		}
 
-		PortText.LostFocus += (sender, e) =>
+		private void DisconnectButton_Click(object? sender, RoutedEventArgs e)
 		{
-			PortText.SetValue(TextBox.ForegroundProperty, Brushes.White);
-		};
+			this.DisconnectButtonClicked?.Invoke(sender, e);
+		}
 
-		EnabledCheckedBox.Click += (sender, e) =>
+		private void FetchHirarchy_Click(object? sender, RoutedEventArgs e)
 		{
-			EnabledCheckedBoxChanged?.Invoke(sender, (bool)EnabledCheckedBox.IsChecked);
-		};
-	}
+			this.FetchHirarchyClicked?.Invoke(sender, e);
+		}
 
-	//All the button events
-
-	private void AttachButton_Click(object? sender, RoutedEventArgs e)
-	{
-		AttachButtonClicked?.Invoke(sender, e);
-
-	}
-
-
-	private void ConnectButton_Click(object? sender, RoutedEventArgs e)
-	{
-		ConnectButtonClicked?.Invoke(sender, e);
-	}
-
-	private void DisconnectButton_Click(object? sender, RoutedEventArgs e)
-	{
-		DisconnectButtonClicked?.Invoke(sender, e);
-	}
-
-	private void FetchHirarchy_Click(object? sender, RoutedEventArgs e)
-	{
-		FetchHirarchyClicked?.Invoke(sender, e);
-	}
-
-
-	private void HierarchyTreeView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-	{
-		SelectedHierachyNode.Invoke(sender, e);
+		private void HierarchyTreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+		{
+			this.SelectedHierachyNode!.Invoke(sender, e);
+		}
 	}
 }

@@ -1,31 +1,41 @@
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Markup.Xaml;
-using UnityPeek.UI;
-
-namespace UnityPeek;
-
-public partial class App : Application
+namespace UnityPeek
 {
-	public override void Initialize()
-	{
-		AvaloniaXamlLoader.Load(this);
-	}
-	UIManager reader;
-	public override void OnFrameworkInitializationCompleted()
-	{
-		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-		{
-			desktop.MainWindow = new MainWindow();
+	using Avalonia;
+	using Avalonia.Controls.ApplicationLifetimes;
+	using Avalonia.Markup.Xaml;
+	using UnityPeek.UI;
 
-			if (desktop.MainWindow is MainWindow mainWindow)
-			{
-				//Create the UIManager instance and start it
-				var uiManager = new UIManager(mainWindow);
-				uiManager.Start();
-			}
-		}
+    /// <summary>
+    /// Represents the main application class for UnityPeek.
+    /// </summary>
+    public partial class App : Application
+    {
+        /// <summary>
+        /// Initializes the application.
+        /// </summary>
+        public override void Initialize()
+        {
+            AvaloniaXamlLoader.Load(this);
+        }
 
-		base.OnFrameworkInitializationCompleted();
-	}
+        /// <summary>
+        /// Called when the framework initialization is completed.
+        /// </summary>
+        public override void OnFrameworkInitializationCompleted()
+        {
+            if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.MainWindow = new MainWindow();
+
+                if (desktop.MainWindow is MainWindow mainWindow)
+                {
+                    // Create the UIManager instance and start it
+                    var uiManager = new UIManager(mainWindow);
+                    uiManager.Start();
+                }
+            }
+
+            base.OnFrameworkInitializationCompleted();
+        }
+    }
 }

@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using UnityPeek.UI;
-
-namespace UnityPeek.Handlers
+﻿namespace UnityPeek.Handlers
 {
-    class InspectorHandler
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Sockets;
+    using System.Text;
+    using System.Threading.Tasks;
+    using UnityPeek.UI;
+
+    public class InspectorHandler
     {
 		public static void ReadTransformData(NetworkStream stream)
 		{
@@ -57,10 +57,10 @@ namespace UnityPeek.Handlers
 						float scaleZ = reader.ReadSingle();
 
 						// Debug output
-						Debug.WriteLine($"Name: {name}, Active: {isActive}");
-						Debug.WriteLine($"Position: ({posX}, {posY}, {posZ})");
-						Debug.WriteLine($"Rotation: ({rotX}, {rotY}, {rotZ}, {rotW})");
-						Debug.WriteLine($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
+						UIManager.LogMessage($"Name: {name}, Active: {isActive}");
+						UIManager.LogMessage($"Position: ({posX}, {posY}, {posZ})");
+						UIManager.LogMessage($"Rotation: ({rotX}, {rotY}, {rotZ}, {rotW})");
+						UIManager.LogMessage($"Scale: ({scaleX}, {scaleY}, {scaleZ})");
 
 						// Update UI
 						UIManager.UpdateSelectedNodeTransform(
@@ -68,12 +68,11 @@ namespace UnityPeek.Handlers
 							isActive,
 							new System.Numerics.Vector3(posX, posY, posZ),
 							new System.Numerics.Quaternion(rotX, rotY, rotZ, rotW),
-							new System.Numerics.Vector3(scaleX, scaleY, scaleZ)
-						);
+							new System.Numerics.Vector3(scaleX, scaleY, scaleZ));
 					}
 					catch (EndOfStreamException)
 					{
-						Debug.WriteLine("Error: Incomplete or corrupted transform data.");
+						UIManager.LogMessage("Error: Incomplete or corrupted transform data.");
 					}
 				}
 			}
