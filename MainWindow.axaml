@@ -113,11 +113,39 @@
 
 		<Border Grid.Row="2" Background="#333" Padding="5">
 			<DockPanel>
+				<Button x:Name="SaveHirarchy" Width="" Height="30" Margin="0,0,5,0" Click="SaveHirarchy_Click" Background="#444" Foreground="White">
+					Save Hirarchy
+					<!-- Icon or content can go here -->
+				</Button>
 				<!-- Magnifying Glass Button -->
 				<Button x:Name="FetchHirarchy" Width="" Height="30" Margin="0,0,5,0" Click="FetchHirarchy_Click" Background="#444" Foreground="White">
 					Fetch Hirarchy
 					<!-- Icon or content can go here -->
 				</Button>
+				
+				<CheckBox x:Name="AutoFetchHirachyCheckbox" IsChecked="False" Foreground="White">Auto Fetch Hirachy</CheckBox>
+				<TextBox x:Name="AutoFetchTime"
+					Text="5"
+					Background="#444"
+					Foreground="White"
+					VerticalAlignment="Center"
+					HorizontalAlignment="Left"
+					Height="30"
+					Width="20"
+					Padding="5"
+					Margin="20,0,5,0"
+					TextWrapping="Wrap">
+				</TextBox>
+				<TextBlock
+					Text="Seconds"
+					Foreground="White"
+					VerticalAlignment="Center"
+					HorizontalAlignment="Left"
+					Height="30"
+					Width="105"
+					Padding="5"
+						   Margin="-8,0,5,0"
+					TextWrapping="Wrap" />
 			</DockPanel>
 		</Border>
 

@@ -130,6 +130,46 @@
 			return node;
 		}
 
+		public static byte[] SerializeHierarchy(Helpers.HierachyStructure root)
+		{
+			using (MemoryStream ms = new MemoryStream())
+			using (BinaryWriter writer = new BinaryWriter(ms, Encoding.UTF8))
+			{
+				// Plugin.Logger.LogInfo("Using BinaryWriter");
+				WriteNode(writer, root);
+				return ms.ToArray();
+			}
+		}
+		private static void WriteNode(BinaryWriter writer, Helpers.HierachyStructure node)
+		{
+			try
+			{
+				// Plugin.Logger.LogInfo("Writing Node!" + node.name);
+				writer.Write(node.Name);
+
+				// Plugin.Logger.LogInfo("Writing Node Name!");
+				writer.Write(node.ID);
+
+				// Plugin.Logger.LogInfo("Writing Node ID!");
+				writer.Write(node.SiblingIndex.Value);
+
+				writer.Write(node.Children.Count); // Write number of children
+
+				// Plugin.Logger.LogInfo("Writing Child Count");
+				foreach (var child in node.Children)
+				{
+					// Plugin.Logger.LogInfo("Writing Node Child!");
+					WriteNode(writer, child); // Recursively write child nodes
+				}
+
+				// Plugin.Logger.LogInfo("Done with those nodes");
+			}
+			catch (Exception e)
+			{
+				
+			}
+		}
+
 		[Serializable]
 		public class HierachyStructure
 		{

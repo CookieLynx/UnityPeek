@@ -36,6 +36,9 @@
 			mainWindow.EnabledCheckedBoxChanged += (sender, isEnabled) => InspectorHandler.EnabledCheckedBoxChanged(isEnabled);
 			mainWindow.SelectedHierachyNode += this.SelectedHierachyNode;
 			mainWindow.DeleteButtonPressed += this.DeleteButtonPressed;
+			mainWindow.AutoFetchTimeChanged += this.ChangedFetchTime;
+			mainWindow.AutoFetchCheckboxChanged += this.AutoFetchCheckboxChanged;
+			mainWindow.SaveHierarchyClicked += this.SaveHierachy;
 			UIManagerSingleton = this;
 		}
 
@@ -65,6 +68,7 @@
 		/// <param name="icon">Icon for icon to display.</param>
 		public static async void ShowPopup(string title, string message, Icon icon)
 		{
+
 			var messageBox = MessageBoxManager
 				.GetMessageBoxStandard(title, message, ButtonEnum.Ok, icon);
 
@@ -81,7 +85,9 @@
 
 				// we also clear the hierarchy view
 				UIManagerSingleton.mainWindow.HierarchyTreeView.ItemsSource = null;
+				UIManagerSingleton.mainWindow.AutoFetchHirachyCheckbox.IsChecked = false;
 			});
+			HierachyHandler.StopAutoFetch();
 		}
 
 		public static void UpdateHierarchyView(HierarchyNode root)
@@ -341,6 +347,75 @@
 			if (this.mainWindow.HierarchyTreeView.SelectedItem is HierarchyNode selectedNode)
 			{
 				HierachyHandler.SelectedNode(selectedNode);
+			}
+		}
+
+		private void ChangedFetchTime(object? sender, EventArgs e)
+		{
+			if (this.mainWindow.AutoFetchTime.Text == null)
+			{
+				return;
+			}
+			if (int.TryParse(this.mainWindow.AutoFetchTime.Text, out int time))
+			{
+				//standardize it to 1 second mimium
+				if (time < 1)
+				{
+					time = 1;
+				}
+				// set the time
+				mainWindow.AutoFetchTime.Text = time.ToString();
+				HierachyHandler.SetAutoFetchTime(time);
+			}
+		}
+
+		private void AutoFetchCheckboxChanged(object? sender, bool isChecked)
+		{
+			if (isChecked)
+			{
+				// Start the auto fetch
+				HierachyHandler.StartAutoFetch();
+			}
+			else
+			{
+				// Stop the auto fetch
+				HierachyHandler.StopAutoFetch();
+			}
+		}
+
+		private async void SaveHierachy(object? sender, EventArgs e)
+		{
+			if (this.mainWindow.StorageProvider != null) // Ensure StorageProvider is available
+			{
+				var file = await this.mainWindow.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+				{
+					Title = "Save Hierarchy File",
+					SuggestedFileName = "hierarchy.json",
+					FileTypeChoices = new[]
+					{
+				new FilePickerFileType("JSON File") { Patterns = new[] { "*.json" } },
+				new FilePickerFileType("All Files") { Patterns = new[] { "*" } },
+			},
+				});
+
+				if (file != null)
+				{
+					var path = file.Path.LocalPath;
+
+					// Save your hierarchy data to the selected file
+					HierachyHandler.SaveHierachy(path);
+
+					UIManager.LogMessage($"Hierarchy saved to: {path}");
+				}
+				else
+				{
+					UIManager.LogMessage("User cancelled the save dialog.");
+				}
+			}
+			else
+			{
+				UIManager.LogMessage("StorageProvider is not available.");
+				ShowPopup("Error", "Could not open the save file dialog.", Icon.Error);
 			}
 		}
 	}

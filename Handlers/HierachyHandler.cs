@@ -6,16 +6,22 @@
     using System.IO;
     using System.Linq;
     using System.Net.Sockets;
-    using UnityPeek.UI;
+	using System.Threading;
+	using Avalonia.Platform.Storage;
+	using MsBox.Avalonia.Enums;
+	using UnityPeek.UI;
 
 	public class HierachyHandler
 	{
 		private static int selectedTransformID = -1;
 		private static List<int> iDList = new List<int>();
 
+		private static Helpers.HierachyStructure cachedRoot;
+
 		// Update the visual of the hierrarchy and delete any duplicate nodes
 		public static void UpdateHierarchy(Helpers.HierachyStructure root)
 		{
+			cachedRoot = root;
 			iDList.Clear();
 			int index = root.SiblingIndex!.Value;
 			var rootNode = new HierarchyNode { Name = root.Name! };
@@ -137,5 +143,57 @@
 			File.WriteAllText(filePath, json);
 			UIManager.LogMessage("Hierarchy JSON saved to: " + filePath);
 		}
+
+		public static int timeBetweenFetch = 5000; // default 5 seconds
+		private static Thread fetchThread;
+		private static bool isRunning = false;
+
+		public static void StartAutoFetch()
+		{
+			if (isRunning) return;
+
+			isRunning = true;
+			fetchThread = new Thread(() =>
+			{
+				while (isRunning)
+				{
+					FetchData(); // Your method to fetch something
+					Thread.Sleep(timeBetweenFetch);
+				}
+			});
+
+			fetchThread.IsBackground = true;
+			fetchThread.Start();
+		}
+
+		public static void StopAutoFetch()
+		{
+			isRunning = false;
+			if (fetchThread != null && fetchThread.IsAlive)
+			{
+				fetchThread.Join(); // Optional: waits for the thread to finish
+			}
+		}
+
+		public static void SetAutoFetchTime(int time)
+		{
+			timeBetweenFetch = time * 1000;
+		}
+
+		private static void FetchData()
+		{
+			Connection.FetchHierarchy();
+		}
+
+		public static void SaveHierachy(string path)
+		{
+			// serialize the cached root
+			string json = System.Text.Json.JsonSerializer.Serialize(Helpers.SerializeHierarchy(cachedRoot));
+
+			// save the json to the path
+			File.WriteAllText(path, json);
+			UIManager.LogMessage("Hierarchy JSON saved to: " + path);
+		}
+
 	}
 }

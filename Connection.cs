@@ -78,7 +78,10 @@
 			}
 			else
 			{
-				UIManager.ShowPopup("Error", "You are not connected to a game", Icon.Error);
+				Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+				{
+					UIManager.ShowPopup("Error", "You are not connected to a game", Icon.Error);
+				});
 			}
 		}
 

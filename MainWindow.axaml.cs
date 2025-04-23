@@ -39,6 +39,11 @@ namespace UnityPeek
 				this.EnabledCheckedBoxChanged?.Invoke(sender, (bool)this.EnabledCheckedBox.IsChecked!);
 			};
 
+			this.AutoFetchHirachyCheckbox.Click += (sender, e) =>
+			{
+				this.AutoFetchCheckboxChanged?.Invoke(sender, (bool)this.AutoFetchHirachyCheckbox.IsChecked!);
+			};
+
 			this.LogTextBox.GotFocus += (sender, e) =>
 			{
 				this.LogTextBox.SetValue(TextBox.ForegroundProperty, Brushes.Black);
@@ -50,6 +55,19 @@ namespace UnityPeek
 				this.LogTextBox.SetValue(TextBox.ForegroundProperty, Brushes.White);
 				//this.LogTextBox.SetValue(TextBox.BackgroundProperty, Brushes.Black);
 			};
+
+			this.AutoFetchTime.LostFocus += (sender, e) =>
+			{
+				this.AutoFetchTime.SetValue(TextBox.ForegroundProperty, Brushes.White);
+				AutoFetchTimeChanged?.Invoke(sender, e);
+			};
+
+			this.AutoFetchTime.GotFocus += (sender, e) =>
+			{
+				this.AutoFetchTime.SetValue(TextBox.ForegroundProperty, Brushes.Black);
+			};
+
+
 		}
 
 		public event EventHandler? AttachButtonClicked;
@@ -65,6 +83,12 @@ namespace UnityPeek
 		public event EventHandler? DeleteButtonPressed;
 
 		public event EventHandler<bool>? EnabledCheckedBoxChanged;
+
+		public event EventHandler<bool>? AutoFetchCheckboxChanged;
+
+		public event EventHandler? AutoFetchTimeChanged;
+
+		public event EventHandler? SaveHierarchyClicked;
 
 		public TextBlock OutputDisplay => this.FindControl<TextBlock>("OutputTextBlock") !;
 
@@ -99,6 +123,11 @@ namespace UnityPeek
 			this.FetchHirarchyClicked?.Invoke(sender, e);
 		}
 
+		private void SaveHirarchy_Click(object? sender, RoutedEventArgs e)
+		{
+			this.SaveHierarchyClicked?.Invoke(sender, e);
+		}
+
 		private void HierarchyTreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
 			this.SelectedHierachyNode!.Invoke(sender, e);
@@ -108,5 +137,8 @@ namespace UnityPeek
 		{
 			this.DeleteButtonPressed?.Invoke(sender, e);
 		}
+
+
+
 	}
 }
