@@ -1,5 +1,6 @@
 <br />
 <div align="center">
+  <img src="Images/UnityPeekLogo.png" alt="Logo" width="240" height="240">
   <h3 align="center">UnityPeek</h3>
 
   <p align="center">
@@ -18,6 +19,13 @@
 UnityPeek is an application that is used along with the UnityPeek BepInEx plugin to give users the ability to read data such as the unity Hierarchy, Components, and much more of a built Unity game!
 
 <h2>This application requires a <a href="https://github.com/BepInEx/BepInEx">BepInEx</a> plugin to work, so it requires a BepInEx compatible Unity game</h2>
+
+
+
+<img src="Images/MainsSreen.png" alt="Main Screen" width="995" height="1023">
+<img src="Images/Screen2.png" alt="Inspector 1" width="995" height="1023">
+<img src="Images/Screen3.png" alt="Inspector 2" width="995" height="1023">
+
 
 FAQ:
 TODO
